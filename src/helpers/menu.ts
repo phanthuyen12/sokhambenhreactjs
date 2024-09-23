@@ -3,7 +3,7 @@ import {
   HORIZONTAL_MENU_ITEMS,
   TWO_COl_MENU_ITEMS,
   MenuItemTypes,
-} from "../constants/menu";
+} from "../constants/menumedical";
 
 const getMenuItems = () => {
   // NOTE - You can fetch from server and return here as well

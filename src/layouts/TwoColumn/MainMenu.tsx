@@ -5,7 +5,7 @@ import { Link } from "react-router-dom";
 import classNames from "classnames";
 
 // constants
-import { MenuItemTypes } from "../../constants/menu";
+import { MenuItemTypes } from "../../constants/menumedical";
 import { LayoutTypes } from "../../constants/layout";
 
 import { useSelector } from "react-redux";

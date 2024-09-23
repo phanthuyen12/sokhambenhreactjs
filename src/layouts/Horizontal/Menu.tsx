@@ -8,7 +8,7 @@ import FeatherIcon from "feather-icons-react";
 import { findAllParent, findMenuItem } from "../../helpers/menu";
 
 // constants
-import { MenuItemTypes } from "../../constants/menu";
+import { MenuItemTypes } from "../../constants/menumedical";
 
 // utils
 import { splitArray } from "../../utils/";

@@ -1,25 +1,32 @@
 import React from "react";
-import { Navigate, Route, Routes } from "react-router-dom";
+import { Route, Routes, Navigate } from "react-router-dom";
 import { useSelector } from "react-redux";
 
 // layout constants
 import { LayoutTypes } from "../constants/layout";
+import { Layoutadmin } from "../constants/layouthospital";
 
-// strore
+// store
 import { RootState } from "../redux/store";
 
 // All layouts containers
 import DefaultLayout from "../layouts/Default";
 import VerticalLayout from "../layouts/Vertical";
 import DetachedLayout from "../layouts/Detached";
-import HorizontalLayout from "../layouts/Horizontal/";
-import TwoColumnLayout from "../layouts/TwoColumn/";
+import HorizontalLayout from "../layouts/Horizontal";
+import TwoColumnLayout from "../layouts/TwoColumn";
+import DefaultLayoutHospital from "../layoutshospital/Default";
+import VerticalLayoutHospital from "../layoutshospital/Vertical";
+import DetachedLayoutHospital from "../layoutshospital/Detached";
+import HorizontalLayoutHospital from "../layoutshospital/Horizontal";
+import TwoColumnLayoutHospital from "../layoutshospital/TwoColumn";
 
 import {
   authProtectedFlattenRoutes,
   publicProtectedFlattenRoutes,
+  publicProtectedFlattenRoutesHospital
+  
 } from "./index";
-import { APICore } from "../helpers/api/apiCore";
 
 interface IRoutesProps {}
 
@@ -28,6 +35,20 @@ const AllRoutes = (props: IRoutesProps) => {
     layout: state.Layout,
   }));
 
+  const getLayoutHospital = () => {
+    switch (layout.layoutType) {
+      case Layoutadmin.LAYOUT_HORIZONTAL:
+        return HorizontalLayoutHospital;
+      case Layoutadmin.LAYOUT_DETACHED:
+        return DetachedLayoutHospital;
+      case Layoutadmin.LAYOUT_VERTICAL:
+        return VerticalLayoutHospital;
+      default:
+        return TwoColumnLayoutHospital;
+    }
+  };
+
+  const LayoutHospital = getLayoutHospital();
   const getLayout = () => {
     let layoutCls = TwoColumnLayout;
 
@@ -48,47 +69,64 @@ const AllRoutes = (props: IRoutesProps) => {
     return layoutCls;
   };
 
-  let Layout = getLayout();
-  const api = new APICore();
+  const Layout = getLayout();
+
+  // Check for token in localStorage
+  const isAuthenticated = !!localStorage.getItem('jwtToken');
+  const isAuthenticatedadmin = !!localStorage.getItem('tokenadmin');
+  console.log("token admin" + isAuthenticatedadmin);
 
   return (
     <React.Fragment>
       <Routes>
-        <Route>
-          {publicProtectedFlattenRoutes.map((route, idx) => (
-            <Route
-              path={route.path}
-              element={
-                <DefaultLayout {...props} layout={layout}>
-                  {route.element}
-                </DefaultLayout>
-              }
-              key={idx}
-            />
-          ))}
-        </Route>
+        {/* Default route: Redirect to /landing */}
+        <Route path="/" element={<Navigate to="/page/landing" />} />
 
-        <Route>
-          {authProtectedFlattenRoutes.map((route, idx) => (
+        {publicProtectedFlattenRoutes.map((route, idx) => {
+          return (
             <Route
               path={route.path}
               element={
-                api.isUserAuthenticated() === false ? (
-                  <Navigate
-                    to={{
-                      pathname: "/auth/login2",
-                      // hash:route.path,
-                      search: "next=" + route.path,
-                    }}
-                  />
+                isAuthenticated && (route.path === "/medical/auth/login2" || route.path === "/medical/auth/register2") ? (
+                  <Navigate to="/medical/" />
                 ) : (
-                  <Layout {...props}>{route.element}</Layout>
+                  <DefaultLayout {...props} layout={layout}>
+                    {route.element}
+                  </DefaultLayout>
                 )
               }
               key={idx}
             />
-          ))}
-        </Route>
+          );
+        })}
+   
+        {authProtectedFlattenRoutes.map((route, idx) => (
+          <Route
+            key={idx}
+            path={route.path}
+            element={
+              isAuthenticated ? (
+                <Layout {...props}>{route.element}</Layout>
+              ) : (
+                <Navigate to="/auth/login2" />
+              )
+            }
+          />
+        ))}
+        
+        {publicProtectedFlattenRoutesHospital.map((route, idx) => (
+          <Route
+            key={idx}
+            path={route.path}
+            element={
+              isAuthenticatedadmin ? (
+                <LayoutHospital {...props}>{route.element}</LayoutHospital>
+              ) : (
+                <Navigate to="/hospital/organization-loginorg" />
+              )
+            }
+          />
+        ))}
       </Routes>
     </React.Fragment>
   );

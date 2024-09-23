@@ -10,7 +10,7 @@ import { useSelector } from "react-redux";
 import { RootState } from "../redux/store";
 
 // constants
-import { LayoutTypes } from "../constants/layout";
+import { LayoutTypes } from "../constants/layouthospital";
 
 // components
 import AppMenu from "./Menu";
